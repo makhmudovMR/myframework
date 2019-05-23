@@ -12,5 +12,13 @@ def home(request, response):
 def about(request, response):
     response.text = "hello from about method"
 
-server = make_server('localhost', 8000, app=app)
-server.serve_forever()
+
+@app.route('/greeting/{name}/')
+def greeting(request, response, name):
+    response.text = 'Hello {}'.format(name)
+
+if __name__ == '__main__':
+    print('Server was start on localhost:8000')
+    server = make_server('localhost', 8000, app=app)
+    server.serve_forever()
+    
