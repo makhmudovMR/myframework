@@ -1,7 +1,9 @@
 from webob import Request, Response
 from parse import parse
+from jinja2 import Environment, FileSystemLoader
 
 import inspect
+import os
 
 
 class Api:
@@ -12,6 +14,7 @@ class Api:
             path: handler_function
         '''
         self.routes = {} # хранит пути и функции ответы
+        self.template_env = Environment(loader=FileSystemLoader(os.path.abspath('templates')))
 
 
     def __call__(self, environ, start_response):
@@ -62,7 +65,17 @@ class Api:
             return handler
         return wrapper
 
+    def add_route(self, path, handler):
+        if path in self.routes:
+            raise AssertionError('Such route already exists')
+        
+        self.routes[path] = handler
+
     def default_response(self, response):
         ''' функция обработчик для несуществующих страниц'''
         response.status_code = 404
         response.text = "Not found."
+
+    
+    def render(self, template_name, context={}):
+        return self.template_env.get_template(template_name).render(**context)

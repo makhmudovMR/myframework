@@ -5,7 +5,7 @@ app = Api()
 
 @app.route('/home')
 def home(request, response):
-    response.text = "hello from home method"
+    response.text = app.render('index.html', {'title': 'Hello world', 'name':'Maga'})
 
 
 @app.route('/about')
