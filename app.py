@@ -1,7 +1,7 @@
 from wsgiref.simple_server import make_server
-from api import API
+from api import Api
 
-app = API()
+app = Api()
 
 @app.route('/home')
 def home(request, response):
@@ -16,6 +16,17 @@ def about(request, response):
 @app.route('/greeting/{name}/')
 def greeting(request, response, name):
     response.text = 'Hello {}'.format(name)
+
+
+@app.route('/books')
+class Books:
+    def get(self, req, resp):
+        resp.text = 'books page'
+
+    def post(self, req, resp):
+        resp.text = 'Endpoint to create a book'
+
+        
 
 if __name__ == '__main__':
     print('Server was start on localhost:8000')

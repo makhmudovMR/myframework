@@ -1,8 +1,10 @@
 from webob import Request, Response
 from parse import parse
 
+import inspect
 
-class API:
+
+class Api:
 
     def __init__(self):
         '''
@@ -28,7 +30,15 @@ class API:
         handler, kwargs = self.find_handler(request.path)
 
         if handler is not None:
-            handler(request, response, **kwargs)
+            if inspect.isclass(handler):
+                # class based view
+                handler_function = getattr(handler(), request.method.lower(), None)
+                if handler_function is None:
+                    raise AssertionError('Method is not allowed ', request.method)
+                handler_function(request, response, **kwargs)
+            else:
+                # function based view
+                handler(request, response, **kwargs)
         else:
             self.default_response(response)
         return response
@@ -43,12 +53,14 @@ class API:
 
     # следует изучить принцип работы данной конструкции
     def route(self, path):
+
+        if path in self.routes:
+                raise AssertionError('Such route already exists.')
+                
         def wrapper(handler):
             self.routes[path] = handler
             return handler
         return wrapper
-
-
 
     def default_response(self, response):
         ''' функция обработчик для несуществующих страниц'''
